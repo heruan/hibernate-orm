@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -627,7 +628,7 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 			allowLoadOutsideTransaction = session.getFactory().getSessionFactoryOptions().isInitializeLazyStateOutsideTransactionsEnabled();
 
 			if ( allowLoadOutsideTransaction ) {
-				enabledFilters = session.getLoadQueryInfluencers().getEnabledFilters();
+				enabledFilters = new HashMap<String, Filter>( session.getLoadQueryInfluencers().getEnabledFilters() );
 				if ( sessionFactoryUuid == null ) {
 					sessionFactoryUuid = session.getFactory().getUuid();
 				}

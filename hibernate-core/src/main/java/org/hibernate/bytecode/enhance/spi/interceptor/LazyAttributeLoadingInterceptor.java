@@ -10,6 +10,7 @@ package org.hibernate.bytecode.enhance.spi.interceptor;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -133,7 +134,7 @@ public class LazyAttributeLoadingInterceptor
 		if ( session != null && !allowLoadOutsideTransaction ) {
 			this.allowLoadOutsideTransaction = session.getFactory().getSessionFactoryOptions().isInitializeLazyStateOutsideTransactionsEnabled();
 			if ( this.allowLoadOutsideTransaction ) {
-				this.enabledFilters = session.getLoadQueryInfluencers().getEnabledFilters();
+				this.enabledFilters = new HashMap<String, Filter>( session.getLoadQueryInfluencers().getEnabledFilters() );
 				this.sessionFactoryUuid = session.getFactory().getUuid();
 			}
 		}

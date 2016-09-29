@@ -7,6 +7,7 @@
 package org.hibernate.proxy;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.Filter;
@@ -231,7 +232,7 @@ public abstract class AbstractLazyInitializer implements LazyInitializer {
 			allowLoadOutsideTransaction = session.getFactory().getSessionFactoryOptions().isInitializeLazyStateOutsideTransactionsEnabled();
 
 			if ( allowLoadOutsideTransaction ) {
-				enabledFilters = session.getLoadQueryInfluencers().getEnabledFilters();
+				enabledFilters = new HashMap<String, Filter>( session.getLoadQueryInfluencers().getEnabledFilters() );
 				if ( sessionFactoryUuid == null ) {
 					sessionFactoryUuid = session.getFactory().getUuid();
 				}
