@@ -7,7 +7,9 @@
 package org.hibernate.bytecode.enhance.spi.interceptor;
 
 import java.util.Locale;
+import java.util.Map;
 
+import org.hibernate.Filter;
 import org.hibernate.FlushMode;
 import org.hibernate.LazyInitializationException;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -25,6 +27,7 @@ public class Helper {
 	interface Consumer {
 		SharedSessionContractImplementor getLinkedSession();
 		boolean allowLoadOutsideTransaction();
+		Map<String, Filter> getEnabledFilters();
 		String getSessionFactoryUuid();
 	}
 
@@ -169,11 +172,15 @@ public class Helper {
 			throwLazyInitializationException( Cause.NO_SF_UUID, lazyInitializationWork );
 		}
 
+		Map<String, Filter> enabledFilters = consumer.getEnabledFilters();
 		final SessionFactoryImplementor sf = (SessionFactoryImplementor)
 				SessionFactoryRegistry.INSTANCE.getSessionFactory( consumer.getSessionFactoryUuid() );
 		final SharedSessionContractImplementor session = (SharedSessionContractImplementor) sf.openSession();
 		session.getPersistenceContext().setDefaultReadOnly( true );
 		session.setHibernateFlushMode( FlushMode.MANUAL );
+		if ( enabledFilters != null ) {
+			session.getLoadQueryInfluencers().getEnabledFilters().putAll( enabledFilters );
+		}
 		return session;
 	}
 }

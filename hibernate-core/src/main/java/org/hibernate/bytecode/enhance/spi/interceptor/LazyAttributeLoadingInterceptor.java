@@ -11,8 +11,10 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.Filter;
 import org.hibernate.LockMode;
 import org.hibernate.bytecode.enhance.spi.CollectionTracker;
 import org.hibernate.bytecode.enhance.spi.LazyPropertyInitializer;
@@ -44,6 +46,7 @@ public class LazyAttributeLoadingInterceptor
 
 	private transient SharedSessionContractImplementor session;
 	private boolean allowLoadOutsideTransaction;
+	private Map<String, Filter> enabledFilters;
 	private String sessionFactoryUuid;
 
 	public LazyAttributeLoadingInterceptor(
@@ -130,6 +133,7 @@ public class LazyAttributeLoadingInterceptor
 		if ( session != null && !allowLoadOutsideTransaction ) {
 			this.allowLoadOutsideTransaction = session.getFactory().getSessionFactoryOptions().isInitializeLazyStateOutsideTransactionsEnabled();
 			if ( this.allowLoadOutsideTransaction ) {
+				this.enabledFilters = session.getLoadQueryInfluencers().getEnabledFilters();
 				this.sessionFactoryUuid = session.getFactory().getUuid();
 			}
 		}
@@ -312,6 +316,11 @@ public class LazyAttributeLoadingInterceptor
 	@Override
 	public boolean allowLoadOutsideTransaction() {
 		return allowLoadOutsideTransaction;
+	}
+
+	@Override
+	public Map<String, Filter> getEnabledFilters() {
+		return enabledFilters;
 	}
 
 	@Override

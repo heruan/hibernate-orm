@@ -10,7 +10,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -86,7 +85,6 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 
 	protected AbstractPersistentCollection(SharedSessionContractImplementor session) {
 		this.session = session;
-		enabledFilters = new HashMap<String, Filter>( session.getLoadQueryInfluencers().getEnabledFilters() );
 	}
 
 	@Override
@@ -279,7 +277,9 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 		final SharedSessionContractImplementor session = (SharedSessionContractImplementor) sf.openSession();
 		session.getPersistenceContext().setDefaultReadOnly( true );
 		session.setFlushMode( FlushMode.MANUAL );
-		session.getLoadQueryInfluencers().getEnabledFilters().putAll( enabledFilters );
+		if ( enabledFilters != null ) {
+			session.getLoadQueryInfluencers().getEnabledFilters().putAll( enabledFilters );
+		}
 		return session;
 	}
 
@@ -626,8 +626,11 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 		if ( session != null ) {
 			allowLoadOutsideTransaction = session.getFactory().getSessionFactoryOptions().isInitializeLazyStateOutsideTransactionsEnabled();
 
-			if ( allowLoadOutsideTransaction && sessionFactoryUuid == null ) {
-				sessionFactoryUuid = session.getFactory().getUuid();
+			if ( allowLoadOutsideTransaction ) {
+				enabledFilters = session.getLoadQueryInfluencers().getEnabledFilters();
+				if ( sessionFactoryUuid == null ) {
+					sessionFactoryUuid = session.getFactory().getUuid();
+				}
 			}
 		}
 	}

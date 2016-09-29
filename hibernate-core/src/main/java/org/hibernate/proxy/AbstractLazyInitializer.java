@@ -7,7 +7,9 @@
 package org.hibernate.proxy;
 
 import java.io.Serializable;
+import java.util.Map;
 
+import org.hibernate.Filter;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.LazyInitializationException;
@@ -43,6 +45,7 @@ public abstract class AbstractLazyInitializer implements LazyInitializer {
 
 	private String sessionFactoryUuid;
 	private boolean allowLoadOutsideTransaction;
+	private Map<String, Filter> enabledFilters;
 
 	/**
 	 * For serialization from the non-pojo initializers (HHH-3309)
@@ -175,6 +178,9 @@ public abstract class AbstractLazyInitializer implements LazyInitializer {
 				SharedSessionContractImplementor session = (SharedSessionContractImplementor) sf.openSession();
 				session.getPersistenceContext().setDefaultReadOnly( true );
 				session.setFlushMode( FlushMode.MANUAL );
+				if ( enabledFilters != null ) {
+					session.getLoadQueryInfluencers().getEnabledFilters().putAll( enabledFilters );
+				}
 
 				boolean isJTA = session.getTransactionCoordinator().getTransactionCoordinatorBuilder().isJta();
 
@@ -224,8 +230,11 @@ public abstract class AbstractLazyInitializer implements LazyInitializer {
 		if ( session != null ) {
 			allowLoadOutsideTransaction = session.getFactory().getSessionFactoryOptions().isInitializeLazyStateOutsideTransactionsEnabled();
 
-			if ( allowLoadOutsideTransaction && sessionFactoryUuid == null ) {
-				sessionFactoryUuid = session.getFactory().getUuid();
+			if ( allowLoadOutsideTransaction ) {
+				enabledFilters = session.getLoadQueryInfluencers().getEnabledFilters();
+				if ( sessionFactoryUuid == null ) {
+					sessionFactoryUuid = session.getFactory().getUuid();
+				}
 			}
 		}
 	}
