@@ -62,6 +62,7 @@ dependencies {
 
 	testCompile( project(':hibernate-testing') )
 
+	testCompile( libraries.mockito )
 	testRuntime( libraries.h2 )
 	testRuntime( libraries.hsqldb )
 	testRuntime( libraries.postgresql )

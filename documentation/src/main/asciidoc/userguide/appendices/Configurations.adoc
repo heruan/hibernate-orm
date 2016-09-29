@@ -228,6 +228,7 @@ Default is `hbm,class"` which indicates to process `hbm.xml` files followed by a
 3+|JDBC-related options
 |`hibernate.use_nationalized_character_data` |`true` or `false` (default value) |Enable nationalized character support on all string / clob based attribute ( string, char, clob, text etc ).
 |`hibernate.jdbc.lob.non_contextual_creation` |`true` or `false` (default value) |Should we not use contextual LOB creation (aka based on `java.sql.Connection#createBlob()` et al)? The default value for HANA, H2, and PostgreSQL is `true`.
+|`hibernate.jdbc.time_zone` | A `java.util.TimeZone`, a `java.time.ZoneId` or a `String` representation of a `ZoneId` |Unless specified, the JDBC Driver uses the default JVM time zone. If a different time zone is configured via this setting, the JDBC https://docs.oracle.com/javase/8/docs/api/java/sql/PreparedStatement.html#setTimestamp-int-java.sql.Timestamp-java.util.Calendar-[PreparedStatement#setTimestamp] is going to use a `Calendar` instance according to the specified time zone.
 
 3+|Bean Validation options
 |`javax.persistence.validation.factory` |`javax.validation.ValidationFactory` implementation | Specify the  `javax.validation.ValidationFactory` implementation to use for Bean Validation.
@@ -600,6 +601,14 @@ If this property is not supplied (or is explicitly `false`), the provider should
 Used to specify the `org.hibernate.tool.schema.spi.SchemaFilterProvider` to be used by `create`, `drop`, `migrate`, and `validate` operations on the database schema.
 `SchemaFilterProvider` provides filters that can be used to limit the scope of these operations to specific namespaces, tables and sequences. All objects are included by default.
 
+|`hibernate.hbm2ddl.jdbc_metadata_extraction_strategy` |`grouped` (default value) or `individually` a|
+
+Setting to choose the strategy used to access the JDBC Metadata.
+Valid options are defined by the `strategy` value of the `org.hibernate.tool.schema.JdbcMetadaAccessStrategy` enum:
+
+`grouped`:: `org.hibernate.tool.schema.spi.SchemaMigrator` and `org.hibernate.tool.schema.spi.SchemaValidator` execute a single `java.sql.DatabaseMetaData#getTables(String, String, String, String[])` call to retrieve all the database table in order to determine if all the `javax.persistence.Entity` have a corresponding mapped database tables.
+`individually`:: `org.hibernate.tool.schema.spi.SchemaMigrator` and `org.hibernate.tool.schema.spi.SchemaValidator` execute one `java.sql.DatabaseMetaData#getTables(String, String, String, String[])` call for each `javax.persistence.Entity` in order to determine if a corresponding database table exists.
+
 |`hibernate.hbm2ddl.delimiter` | `;` |Identifies the delimiter to use to separate schema management statements in script outputs.
 
 |`hibernate.schema_management_tool` |A schema name |Used to specify the `org.hibernate.tool.schema.spi.SchemaManagementTool` to use for performing schema management. The default is to use `org.hibernate.tool.schema.internal.HibernateSchemaManagementTool`
@@ -619,6 +628,7 @@ Therefore, the `org.hibernate.tool.hbm2ddl.UniqueConstraintSchemaUpdateStrategy`
 	Attempts to (re-)create unique constraints, ignoring exceptions thrown if the constraint already existed
 `SKIP`::
 	Does not attempt to create unique constraints on a schema update.
+|`hibernate.hbm2ddl.charset_name` |`Charset.defaultCharset()` |Defines the charset (encoding) used for all input/output schema generation resources. By default, Hibernate uses the default charset given by `Charset.defaultCharset()`. This configuration property allows you to override the default JVM setting so that you can specify which encoding is used when reading and writing schema generation resources (e.g. File, URL).
 
 |===================================================================================================================================================================================================================================
 

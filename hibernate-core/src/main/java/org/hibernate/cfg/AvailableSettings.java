@@ -10,6 +10,7 @@ import org.hibernate.boot.MetadataBuilder;
 import org.hibernate.query.internal.ParameterMetadataImpl;
 import org.hibernate.resource.transaction.spi.TransactionCoordinator;
 import org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder;
+import org.hibernate.tool.schema.JdbcMetadaAccessStrategy;
 import org.hibernate.tool.schema.SourceType;
 
 /**
@@ -711,6 +712,13 @@ public interface AvailableSettings {
 	String BATCH_VERSIONED_DATA = "hibernate.jdbc.batch_versioned_data";
 
 	/**
+	 * Default JDBC TimeZone. Unless specified, the JVM default TimeZone is going to be used by the underlying JDBC Driver.
+	 *
+	 * @since 5.2.3
+	 */
+	String JDBC_TIME_ZONE = "hibernate.jdbc.time_zone";
+
+	/**
 	 * Enable automatic session close at end of transaction
 	 */
 	String AUTO_CLOSE_SESSION = "hibernate.transaction.auto_close_session";
@@ -1304,9 +1312,25 @@ public interface AvailableSettings {
 	String HBM2DDL_FILTER_PROVIDER = "hibernate.hbm2ddl.schema_filter_provider";
 
 	/**
+	 * Setting to choose the strategy used to access the JDBC Metadata.
+	 *
+	 * Valid options are defined by the {@link JdbcMetadaAccessStrategy} enum.
+	 *
+	 * @see JdbcMetadaAccessStrategy
+	 */
+	String HBM2DDL_JDBC_METADATA_EXTRACTOR_STRATEGY = "hibernate.hbm2ddl.jdbc_metadata_extraction_strategy";
+
+	/**
 	 * Identifies the delimiter to use to separate schema management statements in script outputs
 	 */
 	String HBM2DDL_DELIMITER = "hibernate.hbm2ddl.delimiter";
+
+	/**
+	 * The name of the charset used by the schema generation resource. Without specifying this configuration property, the JVM default charset is used.
+	 *
+	 * @since 5.2.3
+	 */
+	String HBM2DDL_CHARSET_NAME = "hibernate.hbm2ddl.charset_name";
 
 
 	String JMX_ENABLED = "hibernate.jmx.enabled";
